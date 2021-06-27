@@ -12,6 +12,7 @@ class ViewController: UIViewController, WKNavigationDelegate {
     var webView: WKWebView!
     var progressView: UIProgressView!
     var websites = ["apple.com", "hackingwithswift.com"]
+    var url: URL?
     
     override func loadView() {
         webView = WKWebView()
@@ -25,20 +26,22 @@ class ViewController: UIViewController, WKNavigationDelegate {
         
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload ))
+        let back = UIBarButtonItem(title: "Back", style: .plain, target: webView, action: #selector(webView.goBack))
+        let forward = UIBarButtonItem(title: "Forward", style: .plain, target: webView, action: #selector(webView.goForward))
         
         progressView = UIProgressView(progressViewStyle: .default)
         progressView.sizeToFit()
         let progressButton = UIBarButtonItem(customView: progressView)
         
-        toolbarItems = [progressButton, spacer, refresh]
+        toolbarItems = [back, progressButton,forward, spacer, refresh]
         navigationController?.isToolbarHidden = false
         
         // Do any additional setup after loading the view.\
         
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         
-        let url = URL(string: "https://" + websites[0])!
-        webView.load(URLRequest(url: url))
+        //let thisUrl = url
+        webView.load(URLRequest(url: url!))
         webView.allowsBackForwardNavigationGestures = true
     }
 
@@ -78,8 +81,16 @@ class ViewController: UIViewController, WKNavigationDelegate {
                     return
                 }
             }
+            
         }
         decisionHandler(.cancel)
+        showAlert()
+    }
+    
+    func showAlert() {
+        let ac = UIAlertController(title: "Error", message: "You are trying to leave save haven!", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Go back", style: .destructive, handler: nil))
+        present(ac, animated: true, completion: nil)
     }
 }
 
